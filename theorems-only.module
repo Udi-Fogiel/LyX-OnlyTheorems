@@ -7,22 +7,54 @@
 
 Preamble
 \usepackage{atbegshi}
-\let\handlethispage\AtBeginShipoutDiscard
+\def\handlethispage{}
 \AtBeginShipout{\handlethispage}
 \usepackage{answers}
+\def\lyx@reverse#1#2{{#2}#1}
+\def\onlythm@parentvalcheck{}
+\def\lyx@Newassociation#1{%
+	\Newassociation{only#1}{mt#1}{mtfile}%
+	\renewenvironment{mt#1}{\expandafter\@gobble\lyx@reverse{\begin{#1}}}{\end{#1}}%
+	\BeforeBeginEnvironment{only#1}{\onlythm@parentvalcheck}}
+\def\onlytheorems@envs{thm,thm*,cor,cor*,lem,lem*,prop,prop*,conjecture,conjecture*,fact,fact*,defn,defn*,example,example*,problem,problem*,xca,xca*,sol,sol*,rem,rem*,claim,claim*,criterion,criterion*,algoritem,algoritem*,ax,ax*,condition,condition*,note,note*,notation,notation*,summary,summary*,acknowledgement,acknowledgement*,conclusion,conclusion*,assumption,assumption*,question,question*}
+\newif\ifonlytheorems\onlytheoremstrue
+\def\onlythm@oldparent{0}
 \AtBeginDocument{%
-	\def\lyx@reverse#1#2{#2#1}
-	\def\xNewassociation#1{\Newassociation{only#1}{mt#1}{mtfile}\renewenvironment{mt#1}{\expandafter\@gobble\lyx@reverse{\begin{#1}}}{\end{#1}}}	
-	\@for\env:={thm,thm*,cor,cor*,lem,lem*,prop,prop*,conjecture,conjecture*,fact,fact*,defn,defn*,example,example*,problem,problem*,xca,xca*,sol,sol*,rem,rem*,claim,claim*,criterion,criterion*,algoritem,algoritem*,ax,ax*,condition,condition*,note,note*,notation,notation*,summary,summary*,acknowledgement,acknowledgement*,conclusion,conclusion*,assumption,assumption*,question,question*}\do{%
+	\ifonlytheorems\let\handlethispage\AtBeginShipoutDiscard\fi
+	\ifcsname c@section\endcsname
+		\begingroup
+		\def\@elt#1{#1,}%
+		\@expandtwoargs\in@{,thm,}{,\cl@section}\ifin@
+			\gdef\onlythm@parentvalcheck{%
+				\ifnum\value{section}=\onlythm@oldparent\relax\else
+				\xdef\onlythm@oldparent{\arabic{section}}%
+				\leavevmode\Writetofile{mtfile}{\protect\stepcounter{section}\protect\setcounter{section}{\onlythm@oldparent}}%
+			\fi}%
+		\else
+		\ifcsname c@chapter\endcsname
+			\@expandtwoargs\in@{,thm,}{,\cl@chapter}\ifin@
+				\gdef\onlythm@parentvalcheck{%
+					\ifnum\value{chapter}=\onlythm@oldparent\relax\else
+					\xdef\onlythm@oldparent{\arabic{chapter}}%
+					\leavevmode\Writetofile{mtfile}{\protect\stepcounter{chapter}\protect\setcounter{chapter}{\onlythm@oldparent}}%
+				\fi}%
+			\fi
+		\fi
+		\endgroup
+	\fi
+	\@for\env:=\onlytheorems@envs\do{%
 		\ifcsname \env\endcsname
-			\expandafter\xNewassociation\expandafter{\env}
-		\fi}}
+			\expandafter\lyx@Newassociation\expandafter{\env}%
+		\fi
+	}
+}
 \Opensolutionfile{mtfile}
 \AtEndDocument{%
-	\clearpage\pagenumbering{arabic}
+	\ifonlytheorems\clearpage\pagestyle{plain}\pagenumbering{arabic}\fi
+	\let\onlythm@parentvalcheck\relx
 	\let\handlethispage\relax
 	\Closesolutionfile{mtfile}
-	\Readsolutionfile{mtfile}}
+	\InputIfFileExists{mtfile}}
 EndPreamble
 
 ModifyStyle Theorem
