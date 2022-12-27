@@ -4,7 +4,7 @@ This module was written to export only  the theorems in a Lyx File.
 
 ## Use
 
-To be able to use the theorems modules, copy the file theorems-only.module to the layouts folder in LyX's user directory (which can be found in Help->About LyX), and reconfigure lyx via Tools->Reconfigure. Note that you should always load this module after all the other theorems modules.
+To install the module, copy the file theorems-only.module to the layouts folder in LyX's user directory (which can be found in Help->About LyX), and reconfigure lyx via Tools->Reconfigure. Note that you should always load this module after all the other theorems modules.
 
 If you want to restate all the theorems at the end of the document, and not to print only the theorems, write in the preamble \onlytheoremsfalse.
 
