@@ -6,55 +6,77 @@
 # Original Author : Udi Fogiel <udifoglle@gmail.com>
 
 Preamble
+\let\thmt@shortoptarg\@empty
+\def\onlythm@gobble#1>{}
 \usepackage{atbegshi}
+\usepackage{environ}
 \def\handlethispage{}
 \AtBeginShipout{\handlethispage}
 \usepackage{answers}
-\def\lyx@reverse#1#2{{#2}#1}
+\renewcommand{\Newassociation}[3]{%
+   \newsolution{#2}%
+   \expandafter\ifx\csname #3opentrue\endcsname\relax
+      \expandafter\newif\csname if#3open\endcsname
+   \fi
+   \NewEnviron{#1}[1][]{%
+		\immediate\write\@nameuse{#3@file}{\string\begin{#2}[##1]\protect\expandafter\onlythm@gobble\meaning\BODY\string\end{#2}}%
+		\begin{#2}[##1]
+		\BODY
+		\end{#2}%
+   }%
+}
 \def\onlythm@parentvalcheck{}
 \def\lyx@Newassociation#1{%
 	\Newassociation{only#1}{mt#1}{mtfile}%
-	\renewenvironment{mt#1}{\expandafter\@gobble\lyx@reverse{\begin{#1}}}{\end{#1}}%
-	\BeforeBeginEnvironment{only#1}{\onlythm@parentvalcheck}}
+	\renewenvironment{mt#1}{\begin{#1}}{\end{#1}}%
+	\BeforeBeginEnvironment{only#1}{\csname onlythm@#1@parentvalcheck\endcsname}}
+\expandafter\gdef\csname onlythm@thm@parentvalcheck\endcsname{}
+\def\onlythm@THM{thm}
+\def\onlythm@parentvalcheck#1{%
+	\expandafter\def\csname onlythm@#1@oldparent\endcsname{-1}%
+	\begingroup
+	\def\@elt##1{,##1}%
+	\edef\onlytheorems@tempa{\cl@@ckpt}%
+	\def\onlythm@tempc{#1}%
+	\ifx\onlythm@tempc\onlythm@THM\else\expandafter\gdef\csname onlythm@#1@parentvalcheck\endcsname{\csname onlythm@thm@parentvalcheck\endcsname}\fi
+	\@for\parent:=\onlytheorems@tempa\do{%
+		\edef\onlytheorems@tempb{\csname cl@\parent\endcsname}%
+		\@expandtwoargs\in@{#1}{\onlytheorems@tempb}\ifin@
+			\expandafter\xdef\csname #1parent\endcsname{\parent}%
+			\expandafter\gdef\csname onlythm@#1@parentvalcheck\endcsname{%
+				\ifnum\value{\csname #1parent\endcsname}=\csname onlythm@#1@oldparent\endcsname\relax\else
+					\expandafter\xdef\csname onlythm@#1@oldparent\endcsname{\arabic{\csname #1parent\endcsname}}%
+					\leavevmode\Writetofile{mtfile}{\protect\stepcounter{\csname #1parent\endcsname}\protect\setcounter{\csname #1parent\endcsname}{\csname onlythm@#1@oldparent\endcsname}}%
+				\fi
+			}
+		\fi
+	}%
+	\endgroup
+}
+
 \def\onlytheorems@envs{thm,thm*,cor,cor*,lem,lem*,prop,prop*,conjecture,conjecture*,fact,fact*,defn,defn*,example,example*,problem,problem*,xca,xca*,sol,sol*,rem,rem*,claim,claim*,criterion,criterion*,algoritem,algoritem*,ax,ax*,condition,condition*,note,note*,notation,notation*,summary,summary*,acknowledgement,acknowledgement*,conclusion,conclusion*,assumption,assumption*,question,question*}
 \newif\ifonlytheorems\onlytheoremstrue
-\def\onlythm@oldparent{0}
 \AtBeginDocument{%
 	\ifonlytheorems\let\handlethispage\AtBeginShipoutDiscard\fi
-	\ifcsname c@section\endcsname
-		\begingroup
-		\def\@elt#1{#1,}%
-		\@expandtwoargs\in@{,thm,}{,\cl@section}\ifin@
-			\gdef\onlythm@parentvalcheck{%
-				\ifnum\value{section}=\onlythm@oldparent\relax\else
-				\xdef\onlythm@oldparent{\arabic{section}}%
-				\leavevmode\Writetofile{mtfile}{\protect\stepcounter{section}\protect\setcounter{section}{\onlythm@oldparent}}%
-			\fi}%
-		\else
-		\ifcsname c@chapter\endcsname
-			\@expandtwoargs\in@{,thm,}{,\cl@chapter}\ifin@
-				\gdef\onlythm@parentvalcheck{%
-					\ifnum\value{chapter}=\onlythm@oldparent\relax\else
-					\xdef\onlythm@oldparent{\arabic{chapter}}%
-					\leavevmode\Writetofile{mtfile}{\protect\stepcounter{chapter}\protect\setcounter{chapter}{\onlythm@oldparent}}%
-				\fi}%
-			\fi
-		\fi
-		\endgroup
-	\fi
 	\@for\env:=\onlytheorems@envs\do{%
 		\ifcsname \env\endcsname
 			\expandafter\lyx@Newassociation\expandafter{\env}%
-		\fi
+			\expandafter\onlythm@parentvalcheck\expandafter{\env}%			
+		\fi	
 	}
 }
 \Opensolutionfile{mtfile}
 \AtEndDocument{%
 	\ifonlytheorems\clearpage\pagestyle{plain}\pagenumbering{arabic}\fi
 	\let\onlythm@parentvalcheck\relx
+	\@for\env:=\onlytheorems@envs\do{%
+		\ifcsname c@\env\endcsname
+			\expandafter\setcounter\expandafter{\env}{0}%
+		\fi
+	}
 	\let\handlethispage\relax
 	\Closesolutionfile{mtfile}
-	\InputIfFileExists{mtfile}}
+	\Readsolutionfile{mtfile}}
 EndPreamble
 
 ModifyStyle Theorem
