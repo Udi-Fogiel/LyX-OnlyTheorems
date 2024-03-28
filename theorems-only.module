@@ -15,7 +15,7 @@ Preamble
 		\end{#1}%
 		\immediate\write\only@thm{%
 			\detokenize{\begin{#1}}%
-			\IfValueT{##1}{\detokenize{[##1]}^^J}%
+			\IfValueT{##1}{\detokenize{[##1]}}^^J%
 			\detokenize{##2}^^J%
 			\detokenize{\end{#1}}}
 	}{}
