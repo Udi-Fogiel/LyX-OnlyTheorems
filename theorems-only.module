@@ -78,7 +78,7 @@ question,question*}
 	\input{\jobname-onlythm.tex}}
 EndPreamble
 
-Style Theorem
+ModifyStyle Theorem
 	LatexName onlythm
 End
 
