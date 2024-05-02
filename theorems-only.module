@@ -65,7 +65,7 @@ question,question*}
 		    \ExpandArgs{ee}\in@{\env}{\onlytheorems@envs}\ifin@
 			\ExpandArgs{e}\new@onlythm{\env}
 		    \else
-		        \ExpandArgs{ee}\NewEnvirenmentCopy{only\env}{\env}
+		        \ExpandArgs{ee}\NewEnvironmentCopy{only\env}{\env}
 		    \fi
 		\fi
 	}
