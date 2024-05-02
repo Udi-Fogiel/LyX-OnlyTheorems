@@ -242,7 +242,7 @@ ModifyStyle Algorithm*
 End
 
 ModifyStyle Axiom*
-	LatexName onlyxax*
+	LatexName onlyax*
 End
 
 ModifyStyle Condition*
