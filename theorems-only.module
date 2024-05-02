@@ -23,11 +23,13 @@ Preamble
 	\AddToHook{env/#1/before}[onlythm]
 		{\csname onlythm@#1@parentvalcheck\endcsname}
 }
-
+\def\onlytheorems@thm{thm}
 \def\onlythm@parentvalcheck#1{%
 	\newcounter{onlythm@#1@oldparent}%
 	\setcounter{onlythm@#1@oldparent}{-1}%
+	\ifx\onlytheorems@tempa\onlytheorems@thm\else
 	\expandafter\def\csname onlythm@#1@parentvalcheck\endcsname{\onlythm@thm@parentvalcheck}%
+	\fi
 	\begingroup
 	\def\@elt##1{,##1}%
 	\edef\onlytheorems@tempa{\cl@@ckpt}%
