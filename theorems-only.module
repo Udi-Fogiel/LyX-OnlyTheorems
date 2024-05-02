@@ -48,21 +48,25 @@ Preamble
 	\endgroup
 }
 
-\def\onlytheorems@envs{%
+\def\onlytheorems@allenvs{%
 thm,thm*,cor,cor*,lem,lem*,prop,prop*,conjecture,conjecture*,%
 fact,fact*,defn,defn*,example,example*,problem,problem*,xca,xca*,%
 sol,sol*,rem,rem*,claim,claim*,criterion,criterion*,algoritem,algoritem*,%
 ax,ax*,condition,condition*,note,note*,notation,notation*,summary,summary*,%
 acknowledgement,acknowledgement*,conclusion,conclusion*,assumption,assumption*,%
 question,question*}
+\let\onlytheorems@envs\onlytheorems@allenvs
 
 \newif\ifonlytheorems\onlytheoremstrue
 \AtBeginDocument{%
 	\ifonlytheorems\AddToHook{shipout/before}[onlythm]{\DiscardShipoutBox}\fi
-	\@for\env:=\onlytheorems@envs\do{%
+	\@for\env:=\onlytheorems@allenvs\do{%
 		\ifcsname \env\endcsname
-			\expandafter\new@onlythm\expandafter{\env}		
-		\fi	
+		    \ExpandArgs{ee}\in@{\env}{\onlytheorems@envs}\ifin@
+			\ExpandArgs{e}\new@onlythm{\env}
+		    \else
+		        \ExpandArgs{ee}\NewEnvirenmentCopy{only\env}{\env}
+		\fi
 	}
 }
 \AtEndDocument{%
