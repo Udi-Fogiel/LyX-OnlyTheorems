@@ -66,6 +66,7 @@ question,question*}
 			\ExpandArgs{e}\new@onlythm{\env}
 		    \else
 		        \ExpandArgs{ee}\NewEnvirenmentCopy{only\env}{\env}
+		    \fi
 		\fi
 	}
 }
