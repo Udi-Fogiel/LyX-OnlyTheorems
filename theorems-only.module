@@ -28,7 +28,7 @@ Preamble
 	\newcounter{onlythm@#1@oldparent}%
 	\setcounter{onlythm@#1@oldparent}{-1}%
 	\ifx\onlytheorems@tempa\onlytheorems@thm\else
-	\expandafter\def\csname onlythm@#1@parentvalcheck\endcsname{\onlythm@thm@parentvalcheck}%
+	\expandafter\def\csname onlythm@#1@parentvalcheck\endcsname{\csname onlythm@thm@parentvalcheck\endcsname}%
 	\fi
 	\begingroup
 	\def\@elt##1{,##1}%
